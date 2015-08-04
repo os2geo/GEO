@@ -52,7 +52,7 @@
             /*y = (0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI);
             var sin = Math.sin(p[1] * Math.PI / 180),
             x = (p[0] / 360 + 0.5),
-        
+
 
             return [x, y];*/
         },
@@ -1920,6 +1920,51 @@
                 }
             }
             res.json(geojson);
+        });
+    });
+    app.get('/api/exportascii/:database', auth, function (req, res) {
+        var d = nano.db.use(req.params.database);
+        d.list({
+            include_docs: true
+        }, function (err, body) {
+            if (err) {
+                return res.status(err.status_code || 500).send(err);
+            }
+            var geojson = {
+                type: "FeatureCollection",
+                "crs": {
+                    "type": "name",
+                    "properties": {
+                        "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+                    }
+                },
+                features: []
+            };
+            for (var i = 0; i < body.rows.length; i++) {
+                var row = body.rows[i];
+                if (row.id.substring(0, 7) !== '_design') {
+                    var doc = {
+                        type: "Feature",
+                        properties: {}
+                    };
+                    if (row.doc.hasOwnProperty("properties")) {
+                        doc.properties = row.doc.properties;
+                    }
+                    doc.properties.id = row.doc["_id"];
+                    doc.properties.rev = row.doc["_rev"];
+                    if (row.doc.hasOwnProperty("geometry")) {
+                        doc.geometry = row.doc.geometry;
+                    }
+                    if (row.doc.hasOwnProperty("_attachments")) {
+                        for (var key in row.doc["_attachments"]) {
+                            doc.properties[key] = "http://geo.os2geo.dk/couchdb/" + req.params.database + "/" + row.id + "/" + key;
+                        }
+
+                    }
+                    geojson.features.push(doc);
+                }
+            }
+            res.end(JSON.stringify(geojson),'ascii');
         });
     });
     //Henter alle apps
