@@ -5,6 +5,7 @@
     'use strict';
     var argv = require('minimist')(process.argv.slice(2)),
         jf = require('jsonfile'),
+        windows1252 = require('windows-1252'),
         crypto = require('crypto'),
         async = require('async'),
         imageType = require('image-type'),
@@ -1964,7 +1965,7 @@
                     geojson.features.push(doc);
                 }
             }
-            res.end(JSON.stringify(geojson),'ascii');
+            res.end(windows1252.encode(JSON.stringify(geojson)),'ascii');
         });
     });
     //Henter alle apps
