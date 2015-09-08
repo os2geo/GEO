@@ -2511,18 +2511,18 @@
                         index: "no"
                     };
                 }
-                console.log(inspect(mappings, {
+                /*console.log(inspect(mappings, {
                     depth: null,
                     colors: true
-                }));
+                }));*/
                 request.del({
                     uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id
                 }, function (err, response, body) {
-                    console.log("del1",err);
+                    //console.log("del1",err);
                     request.del({
                         uri: "http://" + config.elasticsearch.host + "/es/_river/db-" + req.params.id
                     }, function (err, response, body) {
-                        console.log("del2",err);
+                        //console.log("del2",err);
                         request.post({
                             uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id,
                             json: {
