@@ -1965,7 +1965,7 @@
                     geojson.features.push(doc);
                 }
             }
-            res.end(windows1252.encode(JSON.stringify(geojson)),'ascii');
+            res.end(windows1252.encode(JSON.stringify(geojson)), 'ascii');
         });
     });
     //Henter alle apps
@@ -2518,9 +2518,11 @@
                 request.del({
                     uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id
                 }, function (err, response, body) {
+                    console.log("del1",err);
                     request.del({
                         uri: "http://" + config.elasticsearch.host + "/es/_river/db-" + req.params.id
                     }, function (err, response, body) {
+                        console.log("del2",err);
                         request.post({
                             uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id,
                             json: {
