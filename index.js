@@ -2511,10 +2511,10 @@
                         index: "no"
                     };
                 }
-                /*console.log(inspect(mappings, {
+                console.log(inspect(mappings, {
                     depth: null,
                     colors: true
-                }));*/
+                }));
                 request.del({
                     uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id
                 }, function (err, response, body) {
