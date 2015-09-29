@@ -6,7 +6,7 @@
                 name: ""
             };
             $scope.submit = function () {
-                $http.post('/api/fotgot', $scope.user).
+                $http.post('/api/forgot', $scope.user).
                 success(function (data, status, headers, config) {
 
                     $scope.error = false;

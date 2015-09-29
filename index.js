@@ -693,7 +693,6 @@
     });
     //glemt kodeord
     app.post('/api/forgot', function (req, res) {
-        console.log(req.body);
         if (!req.body || !req.body.name) {
             return res.status(400).send(JSON.stringify({
                 ok: false,
