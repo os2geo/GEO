@@ -1086,13 +1086,13 @@
             // TODO:  Add an expiration date for the verification code and check it.
 
             user = body.rows[0].value;
-            if (user.verified) {
+            /*if (user.verified) {
                 return res.status(400).json({
                     ok: false,
                     message: 'Brugeren er allerede verificeret',
                     user: user.name
                 });
-            }
+            }*/
             if (!user.verification_code || user.verification_code !== req.params.code) {
                 return res.status(400).send(JSON.stringify({
                     ok: false,
