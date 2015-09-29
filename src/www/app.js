@@ -37,6 +37,11 @@
                 templateUrl: 'login/login.html',
                 controller: 'login'
             });
+            $stateProvider.state('forgot', {
+                url: '/forgot',
+                templateUrl: 'forgot/forgot.html',
+                controller: 'forgot'
+            });
             $stateProvider.state('frontpage', {
                 url: '/',
                 templateUrl: 'frontpage/frontpage.html',
@@ -576,6 +581,11 @@
                     label: 'Slet',
                 }
             });
+            $stateProvider.state('reset', {
+                url: '/reset/:code',
+                templateUrl: 'reset/reset.html',
+                controller: 'reset'
+            });
             $stateProvider.state('verify', {
                 url: '/verify/:code',
                 templateUrl: 'verify/verify.html',
@@ -628,7 +638,7 @@
                     $urlRouter.sync();
                 }*/
                 /*else {
-                    
+
                     auth.authorize(toState).then(function () {
                         //$urlRouter.sync();
                     }, function () {

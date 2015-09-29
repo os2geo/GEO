@@ -15,6 +15,7 @@
                     } else if (role_admin !== -1) {
                         item.value.role = $scope.options[1];
                     }
+                    item.value.verified = item.value.verified || !item.value.hasOwnProperty('verification_code');
                     $http.jsonp("http://www.gravatar.com/" + md5.createHash(item.value.name) + ".json?callback=JSON_CALLBACK").
                     success(function (data, status, headers, config) {
                         if (data.entry && data.entry.length > 0 && data.entry[0].name && data.entry[0].name.formatted) {

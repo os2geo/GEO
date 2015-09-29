@@ -691,6 +691,55 @@
             res.json(body);
         });
     });
+    //glemt kodeord
+    app.post('/api/forgot', auth, function (req, res) {
+        if (!req.body || !req.body.name) {
+            return res.status(400).send(JSON.stringify({
+                ok: false,
+                message: 'Bruger er påkrævet.'
+            }));
+        }
+        db.get('org.couchdb.user:' + req.body.name, function (err, body) {
+            if (err) {
+                return res.status(401).json({
+                    ok: false,
+                    message: 'Brugeren findes ikke.'
+                });
+            }
+            body.verification_code = uuid.v1();
+            db.insert(body, body._id, function (err, body) {
+                if (err) {
+                    return res.status(err.status_code || 500).send(err);
+                }
+                emailTemplates(templatesDir, function (err, template) {
+                    if (err) {
+                        return res.status(err.status_code || 500).send(err);
+                    }
+                    template('forgot', {
+                        url: config.forgot.url + code
+                            //url: 'http://localhost:3000/#/verify/' + code
+                    }, function (err, html, text) {
+                        if (err) {
+                            return res.status(err.status_code || 500).send(err);
+                        }
+                        transport.sendMail({
+                            from: config.forgot.from,
+                            to: req.body.name,
+                            subject: 'Nulstil password',
+                            html: html,
+                            // generateTextFromHTML: true,
+                            text: text
+                        }, function (err, responseStatus) {
+                            if (err) {
+                                return res.status(err.status_code || 500).send(err);
+                            }
+                            res.json(body);
+                        });
+                    });
+                });
+            });
+        });
+    });
     //Opret bruger
     app.post('/api/user', auth, function (req, res) {
         if (!req.body || !req.body.name || !req.body.role) {
@@ -934,13 +983,13 @@
             // TODO:  Add an expiration date for the verification code and check it.
 
             user = body.rows[0].value;
-            if (user.verified) {
+            /*if (user.verified) {
                 return res.status(400).send(JSON.stringify({
                     ok: false,
                     message: 'Brugeren er allerede verificeret',
                     user: user.name
                 }));
-            }
+            }*/
             if (!user.verification_code || user.verification_code !== req.params.code) {
                 return res.status(400).send(JSON.stringify({
                     ok: false,
@@ -956,6 +1005,7 @@
             //user.password = req.body.password;
             user.salt = salt;
             user.password_sha = hash.digest('hex');
+            delete user.verification_code;
             db.insert(user, user._id, function (err, body) {
                 if (err) {
                     return res.status(err.status_code || 500).send(err);
