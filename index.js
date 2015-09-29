@@ -693,6 +693,7 @@
     });
     //glemt kodeord
     app.post('/api/forgot', function (req, res) {
+        console.log(req.body);
         if (!req.body || !req.body.name) {
             return res.status(400).send(JSON.stringify({
                 ok: false,
@@ -706,7 +707,8 @@
                     message: 'Brugeren findes ikke.'
                 });
             }
-            body.verification_code = uuid.v1();
+            var code = uuid.v1();
+            body.verification_code = code;
             db.insert(body, body._id, function (err, body) {
                 if (err) {
                     return res.status(err.status_code || 500).send(err);
