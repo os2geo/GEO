@@ -136,9 +136,9 @@ var inspect = require('util').inspect,
                     databases[id].feed = feed;
                     feed.on('change', function (change) {
                         var emailoptions = {
-                                reduce: false,
-                                include_docs: true
-                            },
+                            reduce: false,
+                            include_docs: true
+                        },
                             rev;
                         feed.pause();
                         if (change.deleted) {
@@ -171,21 +171,32 @@ var inspect = require('util').inspect,
                                 }
                             });
                         } else {
-                            rev = change.changes[0].rev.split('-');
-                            if (rev[0] === '1') {
-                                emailoptions.key = [id, "create"];
-                                console.log('created: ' + change.id);
-                            } else {
-                                emailoptions.key = [id, "update"];
-                                console.log('updated: ' + change.id);
-                            }
-                            db.get(change.id, function (err, doc) {
-                                if (err) {
-                                    console.log("error get: " + change.id);
-                                    //console.log(err);
+                            if (change.id.charAt(0) !== '_') {
+                                rev = change.changes[0].rev.split('-');
+                                if (rev[0] === '1') {
+                                    emailoptions.key = [id, "create"];
+                                    console.log('created: ' + change.id);
+                                } else {
+                                    emailoptions.key = [id, "update"];
+                                    console.log('updated: ' + change.id);
                                 }
-                                work(emailoptions, doc, template, db, change, feed);
-                            });
+                                db.get(change.id, function (err, doc) {
+                                    if (err) {
+                                        console.log("error get: " + change.id);
+                                        //console.log(err);
+                                    }
+                                    work(emailoptions, doc, template, db, change, feed);
+                                });
+                            }
+                            else {
+                                db.get('_local/follow_since', function (err, doc) {
+                                    doc = doc || {};
+                                    doc.since = change.seq;
+                                    db.insert(doc, '_local/follow_since', function (err, body) {
+                                        feed.resume();
+                                    });
+                                });
+                            }
                         }
                     });
                     console.log("follow: " + id);
