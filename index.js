@@ -544,8 +544,8 @@
             }
             if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart/form-data') !== -1) {
                 var busboy = new Busboy({
-                        headers: req.headers
-                    }),
+                    headers: req.headers
+                }),
                     buffer = [],
                     finalbuffer,
                     contentType;
@@ -718,7 +718,7 @@
                     }
                     template('forgot', {
                         url: config.forgot.url + code
-                            //url: 'http://localhost:3000/#/verify/' + code
+                        //url: 'http://localhost:3000/#/verify/' + code
                     }, function (err, html, text) {
                         if (err) {
                             return res.status(err.status_code || 500).send(err);
@@ -749,6 +749,7 @@
                 message: 'Bruger er påkrævet.'
             }));
         }
+
         db.get('org.couchdb.user:' + req.body.name, function (err, body2) {
             var organization,
                 roles,
@@ -812,7 +813,7 @@
                         template('verify', {
                             user: body,
                             url: config.verify.url + code
-                                //url: 'http://localhost:3000/#/verify/' + code
+                            //url: 'http://localhost:3000/#/verify/' + code
                         }, function (err, html, text) {
                             if (err) {
                                 return res.status(err.status_code || 500).send(err);
@@ -828,7 +829,19 @@
                                 if (err) {
                                     return res.status(err.status_code || 500).send(err);
                                 }
-                                res.json(body);
+                                transport.sendMail({
+                                    from: config.verify.from,
+                                    to: req.userCtx.name,
+                                    subject: 'Du har sendt en invitation til ' + req.body.name,
+                                    html: html,
+                                    // generateTextFromHTML: true,
+                                    text: text
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        return res.status(err.status_code || 500).send(err);
+                                    }
+                                    res.json(body);
+                                });
                             });
                         });
                     });
@@ -1455,17 +1468,17 @@
                         };
                         doc.filters = {
                             schema: "function (doc, req) {" +
-                                "        if (doc._id === '_design/schema' || doc._id === '_design/straks') {" +
-                                "            return true;" +
-                                "        }" +
-                                "        return false;" +
-                                "    }",
+                            "        if (doc._id === '_design/schema' || doc._id === '_design/straks') {" +
+                            "            return true;" +
+                            "        }" +
+                            "        return false;" +
+                            "    }",
                             data: "function (doc, req) {" +
-                                "        if (doc._id.substring(0,7) !== '_design') {" +
-                                "            return true;" +
-                                "        }" +
-                                "        return false;" +
-                                "    }"
+                            "        if (doc._id.substring(0,7) !== '_design') {" +
+                            "            return true;" +
+                            "        }" +
+                            "        return false;" +
+                            "    }"
                         };
                         /*doc.filters = {
                             schema: "function (doc, req) {" +
@@ -1568,15 +1581,15 @@
                     return res.status(err.status_code || 500).send(err);
                 }
                 switch (req.body.security.r) {
-                case "1":
-                    security.members.roles = [];
-                    break;
-                case "2":
-                    security.members.roles = ['user_' + body2.organization, 'admin_' + body2.organization, 'sys'];
-                    break;
-                case "3":
-                    security.members.roles = ['admin_' + body2.organization, 'sys'];
-                    break;
+                    case "1":
+                        security.members.roles = [];
+                        break;
+                    case "2":
+                        security.members.roles = ['user_' + body2.organization, 'admin_' + body2.organization, 'sys'];
+                        break;
+                    case "3":
+                        security.members.roles = ['admin_' + body2.organization, 'sys'];
+                        break;
                 }
                 d.insert(security, '_security', function (err, body) {
                     if (err) {
@@ -1588,40 +1601,40 @@
                         validate = "function (newDoc, oldDoc, userCtx, secObj) { if (newDoc._deleted === true) {";
                     if ((req.body.security.r === '1' && req.body.security.d !== '1') || (req.body.security.r === '2' && req.body.security.d === '3')) {
                         switch (req.body.security.d) {
-                        case "1":
-                            break;
-                        case "2":
-                            validate = validate + validate_user;
-                            break;
-                        case "3":
-                            validate = validate + validate_admin;
-                            break;
+                            case "1":
+                                break;
+                            case "2":
+                                validate = validate + validate_user;
+                                break;
+                            case "3":
+                                validate = validate + validate_admin;
+                                break;
                         }
                     }
                     validate = validate + " } else if (oldDoc === null) { ";
                     if ((req.body.security.r === '1' && req.body.security.c !== '1') || (req.body.security.r === '2' && req.body.security.c === '3')) {
                         switch (req.body.security.c) {
-                        case "1":
-                            break;
-                        case "2":
-                            validate = validate + validate_user;
-                            break;
-                        case "3":
-                            validate = validate + validate_admin;
-                            break;
+                            case "1":
+                                break;
+                            case "2":
+                                validate = validate + validate_user;
+                                break;
+                            case "3":
+                                validate = validate + validate_admin;
+                                break;
                         }
                     }
                     validate = validate + " } else { ";
                     if ((req.body.security.r === '1' && req.body.security.u !== '1') || (req.body.security.r === '2' && req.body.security.u === '3')) {
                         switch (req.body.security.u) {
-                        case "1":
-                            break;
-                        case "2":
-                            validate = validate + validate_user;
-                            break;
-                        case "3":
-                            validate = validate + validate_admin;
-                            break;
+                            case "1":
+                                break;
+                            case "2":
+                                validate = validate + validate_user;
+                                break;
+                            case "3":
+                                validate = validate + validate_admin;
+                                break;
                         }
                     }
                     validate = validate + " } }";
@@ -1664,7 +1677,7 @@
                 }));
             }
             if (!(req.headers['content-type'] &&
-                    req.headers['content-type'].indexOf('multipart/form-data') === 0 && req.method === 'POST')) {
+                req.headers['content-type'].indexOf('multipart/form-data') === 0 && req.method === 'POST')) {
                 return res.status(400).send(JSON.stringify({
                     ok: false,
                     message: 'Fil er påkrævet.'
@@ -2161,9 +2174,9 @@
             });
         }
         var doc = {
-                type: 'template',
-                organizations: []
-            },
+            type: 'template',
+            organizations: []
+        },
             busboy = new Busboy({
                 headers: req.headers
             }),
@@ -2359,9 +2372,9 @@
     //Create geojson tiles
     app.put('/api/rfsconfig/:db/:id', auth, function (req, res) {
         var db = require('nano')({
-                cookie: req.headers.cookie,
-                url: 'http://localhost:' + config.couchdb.port5984 + '/' + req.params.db
-            }),
+            cookie: req.headers.cookie,
+            url: 'http://localhost:' + config.couchdb.port5984 + '/' + req.params.db
+        }),
             i,
             j,
             overlay,
@@ -3428,8 +3441,8 @@
         }
 
         var busboy = new Busboy({
-                headers: req.headers
-            }),
+            headers: req.headers
+        }),
             name,
             id = uuid.v1(),
             //var saveTo = path.join(os.tmpDir(), id);
@@ -3647,4 +3660,4 @@
 
     app.listen(4000);
     console.log('Listening on port 4000');
-}());
+} ());
