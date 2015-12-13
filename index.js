@@ -1965,7 +1965,7 @@
                         }
                     }
                     if (row.doc.hasOwnProperty("_attachments")) {
-                        for(var key in row.doc.['_attachments']){
+                        for(var key in row.doc['_attachments']){
                             if(attachments.indexOf(key)===-1){
                                 attachments.push(key);
                             }
