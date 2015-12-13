@@ -1960,6 +1960,7 @@
                 if (row.id.substring(0, 1) !== '_'){
                     if(row.doc.hasOwnProperty('properties')) {
                         for(var key in row.doc.properties){
+                            console.log(key);
                             if(columns.indexOf(key)!==-1){
                                 columns.push(key);
                             }
