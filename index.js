@@ -1950,7 +1950,7 @@
             if (err) {
                 return res.status(err.status_code || 500).send(err);
             }
-            var csv = "";
+            var csv = '"_id";"_rev"';
             var columns = [];
             var attachments = [];
             for (var i = 0; i < body.rows.length; i++) {
@@ -1970,6 +1970,11 @@
                     }
                 }
             }
+            for(var j=0;j<columns.length;j++){
+                var column = columns[j];
+                csv+=';"'+column+'"';
+            }
+            csv+='\n';
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
                 if (row.id.substring(0, 1) !== '_') {
@@ -1994,7 +1999,7 @@
                 }
             }
             res.header('Content-Type', 'text/csv');
-            res.send(csv);
+            res.send(windows1252.encode(csv));
         });
     });
     app.get('/api/export/:database', auth, function (req, res) {
