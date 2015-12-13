@@ -6,6 +6,7 @@
     var argv = require('minimist')(process.argv.slice(2)),
         jf = require('jsonfile'),
         windows1252 = require('windows-1252'),
+        iconv = require('iconv-lite'),
         crypto = require('crypto'),
         async = require('async'),
         imageType = require('image-type'),
@@ -2001,7 +2002,7 @@
                 }
             }
             res.header('Content-Type', 'text/csv');
-            res.send(csv);
+            res.send(iconv.encode(csv, 'win1252'));
         });
     });
     app.get('/api/export/:database', auth, function (req, res) {
