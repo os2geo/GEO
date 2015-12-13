@@ -1965,9 +1965,11 @@
                         }
                     }
                     if (row.doc.hasOwnProperty("_attachments")) {
-                        if(attachments.indexOf(key)===-1){
-                            attachments.push(key);
-                        }
+                        for(var key in row.doc.['_attachments']){
+                            if(attachments.indexOf(key)===-1){
+                                attachments.push(key);
+                            }
+                        }                        
                     }
                 }
             }
@@ -1992,7 +1994,7 @@
                         var column = attachments[j];
                         var v = "";
                         if (row.doc.hasOwnProperty("_attachments") && row.doc["_attachments"].hasOwnProperty(column)) {
-                            v = "http://geo.os2geo.dk/couchdb/" + req.params.database + "/" + row.id + "/" + column;
+                            v = "https://geo.os2geo.dk/couchdb/" + req.params.database + "/" + row.id + "/" + column;
                         }
                         csv+=';"'+v+'"';
                     }
