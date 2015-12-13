@@ -1953,42 +1953,37 @@
             var csv = "";
             var columns = [];
             var attachments = [];
-            console.log('columns');
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
-                console.log(row.id);
                 if (row.id.substring(0, 1) !== '_'){
                     if(row.doc.hasOwnProperty('properties')) {
                         for(var key in row.doc.properties){
-                            console.log(key);
-                            if(columns.indexOf(key)!==-1){
+                            if(columns.indexOf(key)===-1){
                                 columns.push(key);
                             }
                         }
                     }
                     if (row.doc.hasOwnProperty("_attachments")) {
-                        if(attachments.indexOf(key)!==-1){
+                        if(attachments.indexOf(key)===-1){
                             attachments.push(key);
                         }
                     }
                 }
             }
-            console.log('columns',columns);
-            console.log('rows');
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
                 if (row.id.substring(0, 1) !== '_') {
                     csv += '"'+row.doc["_id"]+'";"'+row.doc["_rev"]+'"';
-                    for(var i=0;i<columns.length;i++){
-                        var column = columns[i];
+                    for(var j=0;j<columns.length;j++){
+                        var column = columns[j];
                         var v = "";
                         if (row.doc.hasOwnProperty("properties") && row.doc.properties.hasOwnProperty(column)) {
                             v = row.doc.properties[column];
                         }
                         csv+=';"'+v+'"';
                     }
-                    for(var i=0;i<attachments.length;i++){
-                        var column = attachments[i];
+                    for(var j=0;j<attachments.length;j++){
+                        var column = attachments[j];
                         var v = "";
                         if (row.doc.hasOwnProperty("_attachments") && row.doc["_attachments"].hasOwnProperty(column)) {
                             v = "http://geo.os2geo.dk/couchdb/" + req.params.database + "/" + row.id + "/" + column;
@@ -1998,7 +1993,6 @@
                     csv+='\n';
                 }
             }
-            console.log('csv');
             res.header('Content-Type', 'text/csv');
             res.send(csv);
         });
