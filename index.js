@@ -1951,9 +1951,7 @@
             if (err) {
                 return res.status(err.status_code || 500).send(err);
             }
-            var csv = "data:text/csv;charset=utf-8,%EF%BB%BF";
-            csv += '\n'; 
-            csv+='"_id";"_rev"';
+            var csv='"_id";"_rev"';
             var columns = [];
             var attachments = [];
             for (var i = 0; i < body.rows.length; i++) {
