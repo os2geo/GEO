@@ -301,7 +301,7 @@
             });
         }
         var user = basicAuth(req);
-        if (!user || !user.name || !user.pass) {
+        if (typeof user === 'undefined') {
             if (req.headers && req.headers.cookie) {
                 return cookie(req, res, next);
             }
@@ -1940,6 +1940,61 @@
                 }
                 res.json(body);
             });
+        });
+    });
+    app.get('/api/exportcsv/:database', auth, function (req, res) {
+        var d = nano.db.use(req.params.database);
+        d.list({
+            include_docs: true
+        }, function (err, body) {
+            if (err) {
+                return res.status(err.status_code || 500).send(err);
+            }
+            var csv = "";
+            var columns = [];
+            var attachments = [];
+            for (var i = 0; i < body.rows.length; i++) {
+                var row = body.rows[i];
+                if (row.id.substring(0, 1) !== '_'){
+                    if(row.doc.hasOwnProperty('properties')) {
+                        for(var key in row.doc.properties){
+                            if(columns.indexOf(key)!==-1){
+                                columns.push(key);
+                            }
+                        }
+                    }
+                    if (row.doc.hasOwnProperty("_attachments")) {
+                        if(attachments.indexOf(key)!==-1){
+                            attachments.push(key);
+                        }
+                    }
+                }
+            }
+            for (var i = 0; i < body.rows.length; i++) {
+                var row = body.rows[i];
+                if (row.id.substring(0, 1) !== '_') {
+                    csv += '"'+row.doc["_id"]+'";"'+row.doc["_rev"]+'"';
+                    for(var i=0;i<columns.length;i++){
+                        var column = columns[i];
+                        var v = "";
+                        if (row.doc.hasOwnProperty("properties") && row.doc.properties.hasOwnProperty(column)) {
+                            v = row.doc.properties[column];
+                        }
+                        csv+=';"'+v+'"';
+                    }
+                    for(var i=0;i<attachments.length;i++){
+                        var column = attachments[i];
+                        var v = "";
+                        if (row.doc.hasOwnProperty("_attachments") && row.doc["_attachments"].hasOwnProperty(column)) {
+                            v = "http://geo.os2geo.dk/couchdb/" + req.params.database + "/" + row.id + "/" + column;
+                        }
+                        csv+=';"'+v+'"';
+                    }
+                    csv+='\n';
+                }
+            }
+            res.header('Content-Type', 'text/csv');
+            res.send(csv);
         });
     });
     app.get('/api/export/:database', auth, function (req, res) {
