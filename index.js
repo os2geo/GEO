@@ -1953,8 +1953,10 @@
             var csv = "";
             var columns = [];
             var attachments = [];
+            console.log('columns');
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
+                console.log(row.id);
                 if (row.id.substring(0, 1) !== '_'){
                     if(row.doc.hasOwnProperty('properties')) {
                         for(var key in row.doc.properties){
@@ -1970,6 +1972,7 @@
                     }
                 }
             }
+            console.log('rows');
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
                 if (row.id.substring(0, 1) !== '_') {
@@ -1993,6 +1996,7 @@
                     csv+='\n';
                 }
             }
+            console.log('csv');
             res.header('Content-Type', 'text/csv');
             res.send(csv);
         });
