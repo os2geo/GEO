@@ -1972,6 +1972,7 @@
                     }
                 }
             }
+            console.log('columns',columns);
             console.log('rows');
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
