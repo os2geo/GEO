@@ -1977,6 +1977,10 @@
                 var column = columns[j];
                 csv+=';"'+column+'"';
             }
+            for(var j=0;j<attachments.length;j++){
+                var column = attachments[j];
+                csv+=';"'+column+'"';
+            }
             csv+='\n';
             for (var i = 0; i < body.rows.length; i++) {
                 var row = body.rows[i];
