@@ -43,9 +43,6 @@
         transport,
         checkAdmin,
         schemaPostPut,
-        nanoClean = require('nano')({
-            "url": "http://localhost:5984"
-        }),
         sinh = function sinh(x) {
             return (Math.exp(x) - Math.exp(-x)) / 2;
         },
@@ -216,7 +213,7 @@
         function cookie(req, res, next) {
             var couchdb = require('nano')({
                 cookie: req.headers.cookie,
-                url: url_5984
+                url: url_5986
             });
             couchdb.session(function (err, session, headers) {
                 if (err) {
@@ -232,7 +229,7 @@
 
         function login(req, res, next) {
             var couchdb = require('nano')({
-                url: url_5984
+                url: url_5986
             });
             couchdb.auth(req.user.name, req.user.pass, function (err, body, headers) {
                 if (err) {
@@ -274,6 +271,10 @@
         if (reg_status !== 3) {
             return res.status(500).send('reg_status er ikke lig med 3');
         }
+        var nanoClean = require('nano')({
+            url: 'http://localhost:5984',
+            cookie: res.headers['set-cookie']
+        });
         var db = nanoClean.use(req.params.db);
         find(id, db).then(function (doc) {
             doc.properties.Status = 'Udbedres';
