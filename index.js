@@ -252,7 +252,7 @@
         }
         return login(user, req, res, next);
     };
-    app.post('/synchronicer/:db', auth, xmlparser(), function (req, res) {
+    app.post('/api/synchronicer/:db', auth, xmlparser(), function (req, res) {
         if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
