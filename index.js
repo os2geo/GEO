@@ -35,6 +35,7 @@
         config,
         app = express(),
         url_5986,
+        url_5984,
         auth,
         db,
         db_admin,
@@ -184,6 +185,7 @@
     }
     transport = nodemailer.createTransport(config.transport);
     url_5986 = "http://localhost:" + config.couchdb.port5986;
+    url_5984 = "http://localhost:" + config.couchdb.port5984;
 
     db = require('nano')({
         url: 'http://localhost:' + config.couchdb.port5986 + '/_users',
@@ -214,7 +216,7 @@
         function cookie(req, res, next) {
             var couchdb = require('nano')({
                 cookie: req.headers.cookie,
-                url: url_5986
+                url: url_5984
             });
             couchdb.session(function (err, session, headers) {
                 if (err) {
@@ -228,11 +230,11 @@
             });
         }
 
-        function login(user, req, res, next) {
+        function login(req, res, next) {
             var couchdb = require('nano')({
-                url: url_5986
+                url: url_5984
             });
-            couchdb.auth(user.name, user.pass, function (err, body, headers) {
+            couchdb.auth(req.user.name, req.user.pass, function (err, body, headers) {
                 if (err) {
                     return unauthorized(res);
                 }
@@ -243,14 +245,14 @@
                 return next();
             });
         }
-        var user = basicAuth(req);
-        if (typeof user === 'undefined') {
+        req.user = basicAuth(req);
+        if (typeof req.user === 'undefined') {
             if (req.headers && req.headers.cookie) {
                 return cookie(req, res, next);
             }
             return unauthorized(res);
         }
-        return login(user, req, res, next);
+        return login(req, res, next);
     };
     app.post('/api/synchronicer/:db', auth, xmlparser(), function (req, res) {
         if (!req.params.db) {
