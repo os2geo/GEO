@@ -220,9 +220,8 @@
                     return unauthorized(res);
                 }
                 req.userCtx = session.userCtx;
-                
+
                 if (headers && headers['set-cookie']) {
-                    req.cookie = headers['set-cookie'];
                     res.set('set-cookie', headers['set-cookie']);
                 }
                 return next();
@@ -275,7 +274,12 @@
         }
         var nanoClean = require('nano')({
             url: 'http://localhost:5984',
-            cookie: req.cookie
+            requestDefaults: {
+                auth: {
+                    user: req.user.name,
+                    pass: req.user.pass
+                }
+            }
         });
         var db = nanoClean.use(req.params.db);
         find(id, db).then(function (doc) {
