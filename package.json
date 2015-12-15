@@ -23,6 +23,7 @@
     "ejs": "^1.0.0",
     "email-templates": "^1.2.1",
     "express": "^4.9.8",
+    "express-xml-bodyparser": "^0.2.2",
     "geojson-vt": "^1.0.1",
     "iconv-lite": "^0.4.13",
     "image-type": "^1.0.0",
