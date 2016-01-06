@@ -253,6 +253,7 @@
         return login(req, res, next);
     };
     app.post('/api/synchronicer/:db', auth, xmlparser(), function (req, res) {
+        console.log(Date.now(),req.body);
         if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
