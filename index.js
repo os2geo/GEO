@@ -252,7 +252,9 @@
         }
         return login(req, res, next);
     };
-    app.post('/api/synchronicer/:db', auth, xmlparser(), function (req, res) {
+    app.post('/api/synchronicer/:db', xmlparser(), function (req, res) {
+        console.log(req.socket.remoteAddress);
+        console.log(req.headers.origin);
         console.log(Date.now(),req.body);
         if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
@@ -273,16 +275,7 @@
         if (reg_status !== 3) {
             return res.status(500).send('reg_status er ikke lig med 3');
         }
-        var nanoClean = require('nano')({
-            url: 'http://localhost:5984',
-            requestDefaults: {
-                auth: {
-                    user: req.user.name,
-                    pass: req.user.pass
-                }
-            }
-        });
-        var db = nanoClean.use(req.params.db);
+        var db = nano.use(req.params.db);
         find(id, db).then(function (doc) {
             doc.properties.Status = 'Udbedres';
             console.log(doc);
