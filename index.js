@@ -266,54 +266,68 @@
         }
         var RE_BOUNDARY = /^application\/.+?(?:; boundary=(?:(?:"(.+)")|(?:([^\s]+))))$/i;
         var m;
-
+        var part = {
+            body: undefined,
+            bodylen: 0,
+            error: undefined,
+            header: undefined
+        };
         if (m = RE_BOUNDARY.exec(req.headers['content-type'])) {
 
             var d = new Dicer({ boundary: m[1] || m[2] });
             d.on('part', function (p) {
-                p.on('data', function (data) {
-                    console.log(data.toString());
-                    parseString(data.toString(), function (err, xml) {
-
-                        if (!(xml.import && xml.import.tour && xml.import.tour.length > 0)) {
-                            return res.status(500).send('XML indeholder ikke tour');
-                        }
-                        var tour = xml.import.tour[0];
-                        if (!(tour.registration && tour.registration.length > 0)) {
-                            return res.status(500).send('tour indeholder ikke registration');
-                        }
-                        var registration = tour.registration[0];
-                        //console.log(inspect(registration, { colors: true, depth: null }));
-                        if (!(registration.hasOwnProperty('$') && registration['$'].hasOwnProperty('reg_reference') && registration['$'].hasOwnProperty('reg_status'))) {
-                            return res.status(500).send('registration indeholder ikke reg_reference og reg_status');
-                        }
-                        var id = parseInt(registration['$'].reg_reference);
-                        if (isNaN(id)) {
-                            return res.status(500).send('reg_reference er ikke sat til et heltal');
-                        }
-                        var reg_status = parseInt(registration['$'].reg_status);
-                        if (reg_status !== 3) {
-                            return res.status(500).send('reg_status er ikke lig med 3');
-                        }
-                        var db = nano.use(req.params.db);
-                        find(id, db).then(function (doc) {
-                            doc.properties.Status = 'Udbedres';
-                            console.log(doc);
-                            return insert(doc, db);
-                        }).then(function (body) {
-                            console.log(body);
-                            res.json(body);
-                        }).catch(function (err) {
-                            console.log(err);
-                            res.sendStatus(500);
-                        })
-                    });
+                p.on('header', function (h) {
+                    part.header = h;
+                }).on('data', function (data) {
+                    if (!part.body)
+                        part.body = [data];
+                    else
+                        part.body.push(data);
+                    part.bodylen += data.length;
+                }).on('end', function () {
+                    if (part.body)
+                        part.body = Buffer.concat(part.body, part.bodylen);
                 });
             });
-            /*d.on('finish', function () {
-                res.writeHead(200);
-                res.end('Form submission successful!');
-            });*/
+            d.on('finish', function () {
+                var data = part.body.toString();
+                console.log(data);
+                parseString(data, function (err, xml) {
+
+                    if (!(xml.import && xml.import.tour && xml.import.tour.length > 0)) {
+                        return res.status(500).send('XML indeholder ikke tour');
+                    }
+                    var tour = xml.import.tour[0];
+                    if (!(tour.registration && tour.registration.length > 0)) {
+                        return res.status(500).send('tour indeholder ikke registration');
+                    }
+                    var registration = tour.registration[0];
+                    //console.log(inspect(registration, { colors: true, depth: null }));
+                    if (!(registration.hasOwnProperty('$') && registration['$'].hasOwnProperty('reg_reference') && registration['$'].hasOwnProperty('reg_status'))) {
+                        return res.status(500).send('registration indeholder ikke reg_reference og reg_status');
+                    }
+                    var id = parseInt(registration['$'].reg_reference);
+                    if (isNaN(id)) {
+                        return res.status(500).send('reg_reference er ikke sat til et heltal');
+                    }
+                    var reg_status = parseInt(registration['$'].reg_status);
+                    if (reg_status !== 3) {
+                        return res.status(500).send('reg_status er ikke lig med 3');
+                    }
+                    var db = nano.use(req.params.db);
+                    find(id, db).then(function (doc) {
+                        doc.properties.Status = 'Udbedres';
+                        console.log(doc);
+                        return insert(doc, db);
+                    }).then(function (body) {
+                        console.log(body);
+                        res.json(body);
+                    }).catch(function (err) {
+                        console.log(err);
+                        res.sendStatus(500);
+                    })
+                });
+            });
             req.pipe(d);
         } else {
             res.writeHead(404);
