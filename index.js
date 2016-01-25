@@ -333,33 +333,21 @@
             });
             req.pipe(d);
         } else {
-            res.writeHead(404);
+            //res.writeHead(404);
+            //res.end();
+            console.log('########### Fejl ############');
+            console.log(req.headers['content-type']);
+            var data = '';
+            req.on('data', function (chunk) {
+                data += chunk;
+            });
+            req.on('end', function () {
+                console.log(data);
+            });
+
             res.end();
+
         }
-    
-   
-        /*var data = '';
-        req.on('data', function (chunk) {
-            data += chunk;
-        });
-        req.on('end', function () {
-            console.log(data);
-        });
-    
-        res.end();
-    */
-        /*var form = new formidable.IncomingForm();
-        form.parse(req, function (err, fields, files) {
-            res.writeHead(200, { 'content-type': 'text/plain' });
-            res.write('received upload:\n\n');
-            res.end(inspect({ fields: fields, files: files }));
-        });
-    */
-
-
-        //res.end();
-
-        
     });
 
     app.use('/tilestream', function (req, res) {
