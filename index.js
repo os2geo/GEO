@@ -267,7 +267,7 @@
         if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
-        var RE_BOUNDARY = /^application\/.+?(?:; boundary=(?:(?:"(.+)")|(?:([^\s]+))))$/i;
+        var RE_BOUNDARY = /^multipart\/.+?(?:; boundary=(?:(?:"(.+)")|(?:([^\s]+))))$/i;
         var m;
         var part = {
             body: undefined,
