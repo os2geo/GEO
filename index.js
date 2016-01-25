@@ -261,6 +261,9 @@
 
         console.log(timestamps);
         console.log('ip', req.ip);
+        if (req.ip !== '86.48.35.66' && req.ip !== '86.58.182.98' && req.ip !== '188.178.222.138') {
+            return res.status(403).send('Der er ikke adgang fra denne ip adresse ' + req.ip);
+        }
         if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
