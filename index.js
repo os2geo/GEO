@@ -5,7 +5,6 @@
     'use strict';
     var argv = require('minimist')(process.argv.slice(2)),
         jf = require('jsonfile'),
-        xmlparser = require('express-xml-bodyparser'),
         windows1252 = require('windows-1252'),
         iconv = require('iconv-lite'),
         crypto = require('crypto'),
@@ -21,6 +20,8 @@
         basicAuth = require('basic-auth'),
         cors = require('cors'),
         bodyParser = require('body-parser'),
+        parseString = require('xml2js').parseString,
+        Dicer = require('dicer'),
         //var busboy = require('connect-busboy');
         Busboy = require('busboy'),
         geojsonvt = require('geojson-vt'),
@@ -252,55 +253,96 @@
         }
         return login(req, res, next);
     };
-    app.set('trust proxy', ['10.129.147.154','10.129.146.148']);
+    app.set('trust proxy', ['10.129.147.154', '10.129.146.148']);
     //app.post('/api/synchronicer/:db', xmlparser(), function (req, res) {
     app.post('/api/synchronicer/:db', function (req, res) {
         var timestamp = new Date();
         var timestamps = timestamp.toJSON();
 
         console.log(timestamps);
-        console.log('ip',req.ip);
-        var data = '';
-        req.on('data', function (chunk) {
-          data += chunk;
-        });
-        req.on('end', function () {
-          console.log(data);
-        });
-
-        res.end();
-
-        /*if (!req.params.db) {
+        console.log('ip', req.ip);
+        if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
-        if (!(req.body && req.body.import && req.body.import.tour && req.body.import.tour.length > 0)) {
-            return res.status(500).send('XML indeholder ikke tour');
+        var RE_BOUNDARY = /^application\/.+?(?:; boundary=(?:(?:"(.+)")|(?:([^\s]+))))$/i;
+        var m;
+
+        if (m = RE_BOUNDARY.exec(req.headers['content-type'])) {
+
+            var d = new Dicer({ boundary: m[1] || m[2] });
+            d.on('part', function (p) {
+                p.on('data', function (data) {
+
+                    parseString(data.toString(), function (err, xml) {
+                        
+                        if (!(xml.import && xml.import.tour && xml.import.tour.length > 0)) {
+                            return res.status(500).send('XML indeholder ikke tour');
+                        }
+                        var tour = xml.import.tour[0];
+                        if (!(tour.registration && tour.registration.length > 0)) {
+                            return res.status(500).send('tour indeholder ikke registration');
+                        }
+                        var registration = tour.registration[0];
+                        //console.log(inspect(registration, { colors: true, depth: null }));
+                        if (!(registration.hasOwnProperty('$') && registration['$'].hasOwnProperty('reg_reference') && registration['$'].hasOwnProperty('reg_status'))) {
+                            return res.status(500).send('registration indeholder ikke reg_reference og reg_status');
+                        }
+                        var id = parseInt(registration['$'].reg_reference);
+                        if (isNaN(id)) {
+                            return res.status(500).send('reg_reference er ikke sat til et heltal');
+                        }
+                        var reg_status = parseInt(registration['$'].reg_status);
+                        if (reg_status !== 3) {
+                            return res.status(500).send('reg_status er ikke lig med 3');
+                        }
+                        var db = nano.use(req.params.db);
+                        find(id, db).then(function (doc) {
+                            doc.properties.Status = 'Udbedres';
+                            console.log(doc);
+                            return insert(doc, db);
+                        }).then(function (body) {
+                            console.log(body);
+                            res.json(body);
+                        }).catch(function (err) {
+                            console.log(err);
+                            res.sendStatus(500);
+                        })
+                    });
+                });
+            });
+            /*d.on('finish', function () {
+                res.writeHead(200);
+                res.end('Form submission successful!');
+            });*/
+            req.pipe(d);
+        } else {
+            res.writeHead(404);
+            res.end();
         }
-        var tour = req.body.import.tour[0];
-        if (!(tour.registration && tour.registration.length > 0)) {
-            return res.status(500).send('tour indeholder ikke registration');
-        }
-        var registration = tour.registration[0];
-        if (!(registration.hasOwnProperty('$') && registration['$'].hasOwnProperty('reg_reference') && registration['$'].hasOwnProperty('reg_status'))) {
-            return res.status(500).send('registration indeholder ikke reg_reference og reg_status');
-        }
-        var id = parseInt(registration['$'].reg_reference);
-        var reg_status = parseInt(registration['$'].reg_status);
-        if (reg_status !== 3) {
-            return res.status(500).send('reg_status er ikke lig med 3');
-        }
-        var db = nano.use(req.params.db);
-        find(id, db).then(function (doc) {
-            doc.properties.Status = 'Udbedres';
-            console.log(doc);
-            return insert(doc, db);
-        }).then(function (body) {
-            console.log(body);
-            res.json(body);
-        }).catch(function (err) {
-            console.log(err);
-            res.sendStatus(500);
-        })*/
+    
+   
+        /*var data = '';
+        req.on('data', function (chunk) {
+            data += chunk;
+        });
+        req.on('end', function () {
+            console.log(data);
+        });
+    
+        res.end();
+    */
+        /*var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            res.writeHead(200, { 'content-type': 'text/plain' });
+            res.write('received upload:\n\n');
+            res.end(inspect({ fields: fields, files: files }));
+        });
+    */
+
+
+        //res.end();
+
+        
     });
 
     app.use('/tilestream', function (req, res) {
@@ -1339,7 +1381,7 @@
             if (headers && headers['set-cookie']) {
                 res.set('set-cookie', headers['set-cookie']);
             }
-
+    
             db_admin.get(req.params.id, function (err, body) {
                 if (err) {
                     return res.status(err.status_code || 500).send(err);
