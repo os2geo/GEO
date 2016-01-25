@@ -252,11 +252,25 @@
         }
         return login(req, res, next);
     };
-    app.post('/api/synchronicer/:db', xmlparser(), function (req, res) {
-        console.log(req.socket.remoteAddress);
-        console.log(req.headers.origin);
-        console.log(Date.now(),req.body);
-        if (!req.params.db) {
+    app.set('trust proxy', ['10.129.147.154','10.129.146.148']);
+    //app.post('/api/synchronicer/:db', xmlparser(), function (req, res) {
+    app.post('/api/synchronicer/:db', function (req, res) {
+        var timestamp = new Date();
+        var timestamps = timestamp.toJSON();
+
+        console.log(timestamps);
+        console.log('ip',req.ip);
+        var data = '';
+        req.on('data', function (chunk) {
+          data += chunk;
+        });
+        req.on('end', function () {
+          console.log(data);
+        });
+
+        res.end();
+
+        /*if (!req.params.db) {
             return res.status(500).send('Database ikke angivet');
         }
         if (!(req.body && req.body.import && req.body.import.tour && req.body.import.tour.length > 0)) {
@@ -286,7 +300,7 @@
         }).catch(function (err) {
             console.log(err);
             res.sendStatus(500);
-        })
+        })*/
     });
 
     app.use('/tilestream', function (req, res) {
@@ -384,7 +398,7 @@
 
     app.use(express["static"](__dirname)); //  "public" off of current is root
 
-    
+
 
     //region Login
     app.post('/api/signin', function (req, res) {
