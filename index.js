@@ -272,9 +272,9 @@
             var d = new Dicer({ boundary: m[1] || m[2] });
             d.on('part', function (p) {
                 p.on('data', function (data) {
-
+                    console.log(data.toString());
                     parseString(data.toString(), function (err, xml) {
-                        
+
                         if (!(xml.import && xml.import.tour && xml.import.tour.length > 0)) {
                             return res.status(500).send('XML indeholder ikke tour');
                         }
