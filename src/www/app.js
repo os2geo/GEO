@@ -443,6 +443,14 @@
                     label: 'Data'
                 }
             });
+            $stateProvider.state('database.query', {
+                url: '/query',
+                templateUrl: 'database/query/query.html',
+                controller: 'database-query',
+                ncyBreadcrumb: {
+                    label: 'Query'
+                }
+            });
             $stateProvider.state('database.upload', {
                 url: '/upload',
                 templateUrl: 'database/upload/upload.html',
