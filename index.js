@@ -1578,7 +1578,7 @@
             if (err) {
                 return res.status(err.status_code || 500).send(err);
             }
-            if (req.userCtx.roles.indexOf("sys") === -1 && req.userCtx.roles.indexOf("admin_" + database.organization) === -1) {
+            if (req.userCtx.roles.indexOf("_admin") === -1 && req.userCtx.roles.indexOf("sys") === -1 && req.userCtx.roles.indexOf("admin_" + database.organization) === -1) {
                 return res.status(401).send(JSON.stringify({
                     ok: false,
                     message: 'Du har ikke rettigheder til at oprette databaser.'
