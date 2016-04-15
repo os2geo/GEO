@@ -45,6 +45,19 @@ var replicate = function () {
                 console.log('Fejl: ' + db);
             } else {
                 //console.log('OK: ' + db);
+                var d = bigcouch.use(db);
+                d.get('_security', function (err, body) {
+                    if (!err) {
+                        var dd = couchdb.use(db);
+                        dd.insert(body, '_security', function (err, body) {
+                            if (err) {
+                                console.log('Fejl security: ' + db);
+                            } else {
+                                console.log('OK security: ' + db);
+                            }
+                        });
+                    }
+                });
             }
             replicate();
         });
