@@ -24,7 +24,7 @@ var replicate = function () {
         var db = all_dbs.pop();
         console.log(db);
 
-        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch:5984/' + db, db {
+        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch:5984/' + db, db, {
             create_target: true
         }, function (err, body) {
             if (err) {
