@@ -1,5 +1,5 @@
 /*global require, console,process*/
-var config = require('config.json');
+var config = require('./config.json');
 var nano = require('nano')({
     url: 'http://localhost:5986',
     requestDefaults: {
