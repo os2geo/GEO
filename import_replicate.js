@@ -44,7 +44,7 @@ var replicate = function () {
 
                 console.log('Fejl: ' + db);
             } else {
-                console.log('OK: ' + db);
+                //console.log('OK: ' + db);
             }
             replicate();
         });
