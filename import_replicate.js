@@ -22,7 +22,7 @@ var all_dbs = [];
 var replicate = function () {
     if (all_dbs.length > 0) {
         var db = all_dbs.pop();
-        console.log(db);
+
         /*couchdb.db.create(db, function (err, body) {
             if (err) {
                 console.log(err);
@@ -39,11 +39,12 @@ var replicate = function () {
             });
         });
     */
-        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch1:5984/' + db, db, { create_target:true }, function (err, body) {
+        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch1:5984/' + db, db, { create_target: true }, function (err, body) {
             if (err) {
-                console.log(err);
+
+                console.log('Fejl: ' + db);
             } else {
-                console.log(body);
+                console.log('OK: ' + db);
             }
             replicate();
         });
