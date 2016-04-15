@@ -1,7 +1,7 @@
 /*global require, console,process*/
 var config = require('./config.json');
 var bigcouch = require('nano')({
-    url: 'http://localhost:5986',
+    url: 'http://localhost:5984',
     requestDefaults: {
         auth: {
             user: config.couchdb.user,
@@ -15,7 +15,7 @@ var replicate = function () {
     if (all_dbs.length > 0) {        
         var db = all_dbs.pop();
         console.log(db);
-        nano.db.replicate(db, 'http://' + config.couchdb.user + ':' + config.couchdb.password + '@couchdb:5984/' + db, { 
+        bigcouch.db.replicate(db, 'http://' + config.couchdb.user + ':' + config.couchdb.password + '@couchdb:5984/' + db, { 
             create_target: true 
         }, function (err, body) {
                 if (err) {
