@@ -39,7 +39,7 @@ var replicate = function () {
             });
         });
     */
-        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch1:5984/' + db, db, function (err, body) {
+        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch1:5984/' + db, db, { create_target:true }, function (err, body) {
             if (err) {
                 console.log(err);
             } else {
