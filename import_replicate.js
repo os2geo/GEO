@@ -23,18 +23,21 @@ var replicate = function () {
     if (all_dbs.length > 0) {
         var db = all_dbs.pop();
         console.log(db);
-
-        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch:5984/' + db, db, {
-            create_target: true
-        }, function (err, body) {
+        couchdb.db.create(db, function (err, body) {
             if (err) {
                 console.log(err);
             } else {
                 console.log(body);
             }
-            replicate();
+            bigcouch.db.replicate(db, 'http://' + config.couchdb.user + ':' + config.couchdb.password + '@couchdb:5984/' + db, function (err, body) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log(body);
+                }
+                replicate();
+            });
         });
-
 
     }
 };
