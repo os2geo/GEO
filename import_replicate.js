@@ -43,8 +43,8 @@ var replicate = function () {
 
         couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch:5984/' + db, db, { create_target: true }, function (err, body) {
             if (err) {
-
                 console.log('Fejl: ' + db);
+                console.log(util.inspect(err, { colors: true, depth: null }));
             } else {
                 //console.log('OK: ' + db);
                 var d = bigcouch.use(db);
@@ -53,9 +53,9 @@ var replicate = function () {
                         var dd = couchdb.use(db);
                         dd.insert(body, '_security', function (err, body) {
                             if (err) {
-                                console.log('Fejl security: ' + db);
+                                //console.log('Fejl security: ' + db);
                             } else {
-                                console.log('OK security: ' + db);
+                                //console.log('OK security: ' + db);
                             }
                             /*d.get('_local/follow_since', function (err, doc) {
                                 if (err) {
