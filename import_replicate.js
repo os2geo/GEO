@@ -1,4 +1,5 @@
 /*global require, console,process*/
+var util = require('util');
 var config = require('./config.json');
 var bigcouch = require('nano')({
     url: 'http://bigcouch:5984',
@@ -60,7 +61,7 @@ var replicate = function () {
                                 if (err) {
                                     console.log('Fejl _local ' + db + ': ' + err);
                                 } else {
-                                    console.log('_local ' + db + ': ' + doc);
+                                    console.log('_local ' + db + ': ' + util.inspect(doc, { showHidden: false, depth: null }));
                                 }
 
                             });
