@@ -1485,10 +1485,12 @@
                     if (err) {
                         return res.status(err.status_code || 500).send(err);
                     }
-                    if (body3.members.roles.indexOf('user_' + body.organization) !== -1) {
-                        security.r = 2;
-                    } else if (body3.members.roles.indexOf('admin_' + body.organization) !== -1) {
-                        security.r = 3;
+                    if(body3.members && body3.members.roles){
+                        if (body3.members.roles.indexOf('user_' + body.organization) !== -1) {
+                            security.r = 2;
+                        } else if (body3.members.roles.indexOf('admin_' + body.organization) !== -1) {
+                            security.r = 3;
+                        }
                     }
                     d.get("_design/security", function (err, body4) {
                         if (!err) {
