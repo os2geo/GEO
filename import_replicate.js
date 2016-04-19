@@ -57,14 +57,14 @@ var replicate = function () {
                             } else {
                                 console.log('OK security: ' + db);
                             }
-                            d.get('_local/follow_since', function (err, doc) {
+                            /*d.get('_local/follow_since', function (err, doc) {
                                 if (err) {
                                     console.log('Fejl _local ' + db + ': ' + err);
                                 } else {
                                     console.log('_local ' + db + ': ' + util.inspect(doc, { showHidden: false, depth: null }));
                                 }
 
-                            });
+                            });*/
                         });
                     }
 
