@@ -1,7 +1,7 @@
 /*global require, console,process*/
 var config = require('./config.json');
 var bigcouch = require('nano')({
-    url: 'http://bigcouch1:5984',
+    url: 'http://bigcouch:5984',
     requestDefaults: {
         auth: {
             user: config.couchdb.user,
@@ -39,7 +39,8 @@ var replicate = function () {
             });
         });
     */
-        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch1:5984/' + db, db, { create_target: true }, function (err, body) {
+
+        couchdb.db.replicate('http://' + config.couchdb.user + ':' + config.couchdb.password + '@bigcouch:5984/' + db, db, { create_target: true }, function (err, body) {
             if (err) {
 
                 console.log('Fejl: ' + db);
@@ -55,8 +56,17 @@ var replicate = function () {
                             } else {
                                 console.log('OK security: ' + db);
                             }
+                            d.get('_local/follow_since', function (err, doc) {
+                                if (err) {
+                                    console.log('Fejl _local ' + db + ': ' + err);
+                                } else {
+                                    console.log('_local ' + db + ': ' + doc);
+                                }
+
+                            });
                         });
                     }
+
                 });
             }
             replicate();
