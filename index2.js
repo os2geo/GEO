@@ -80,6 +80,7 @@ var inspect = require('util').inspect,
                 console.log(err);
                 feed.resume();
             } else {
+
                 data.rows.forEach(function (row) {
                     var key, ok, item, email;
                     if (row.doc.users) {
@@ -88,9 +89,13 @@ var inspect = require('util').inspect,
                                 item = row.doc.users[key];
                                 ok = testrules(item.rules, doc);
                                 if (ok) {
-                                    template(row.id, {
-                                        doc: doc
-                                    }, sendmail(key, row.doc.name));
+                                    try {
+                                        template(row.id, {
+                                            doc: doc
+                                        }, sendmail(key, row.doc.name));
+                                    } catch (err) {
+                                        console.log(fejl, row);
+                                    }
                                 }
                             }
                         }
@@ -102,14 +107,19 @@ var inspect = require('util').inspect,
                                 item = row.doc.userfields[key];
                                 ok = testrules(item.rules, doc);
                                 if (ok && email) {
-                                    template(row.id, {
-                                        doc: doc
-                                    }, sendmail(email, row.doc.name));
+                                    try {
+                                        template(row.id, {
+                                            doc: doc
+                                        }, sendmail(email, row.doc.name));
+                                    } catch (err) {
+                                        console.log(fejl, row);
+                                    }
                                 }
                             }
                         }
                     }
                 });
+
                 db.get('_local/follow_since', function (err, doc) {
                     doc = doc || {};
                     doc.since = change.seq;
@@ -191,7 +201,7 @@ var inspect = require('util').inspect,
                             else {
                                 db.get('_local/follow_since', function (err, doc) {
                                     doc = doc || {};
-                                    doc.since = change.seq;
+                                    doc.since = change.seq;                                    
                                     db.insert(doc, '_local/follow_since', function (err, body) {
                                         feed.resume();
                                     });
@@ -222,6 +232,8 @@ if (argv.config) {
     transport = nodemailer.createTransport(config.transport);
     nano = require('nano')({
         url: 'http://' + config.couchdb.user + ':' + config.couchdb.password + '@' + config.couchdb.host + ':' + config.couchdb.port5984,
+        //url: 'http://' + config.couchdb.user + ':' + config.couchdb.password + '@' + config.couchdb.host,
+        //"parseUrl" : false,
         "requestDefaults": {
             "agent": myagent
         }
@@ -256,6 +268,7 @@ if (argv.config) {
                 body.rows.forEach(function (row) {
                     var id = row.key[0];
                     databases[id] = {};
+                    console.log(id);
                     //if (id === "7329765f31b7939dc2b457f483107688") {
                     process.nextTick(function () {
                         followDatabase(id, template);
