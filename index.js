@@ -1149,13 +1149,13 @@
             }
             //delete user.verification_code;
 
-            var salt = crypto.randomBytes(16).toString('hex'),
+            /*var salt = crypto.randomBytes(16).toString('hex'),
                 hash = crypto.createHash('sha1');
-            hash.update(req.body.password + salt);
+            hash.update(req.body.password + salt);*/
             user.verified = new Date();
-            //user.password = req.body.password;
-            user.salt = salt;
-            user.password_sha = hash.digest('hex');
+            user.password = req.body.password;
+            /*user.salt = salt;
+            user.password_sha = hash.digest('hex');*/
             delete user.verification_code;
             db.insert(user, user._id, function (err, body) {
                 if (err) {
