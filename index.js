@@ -1674,9 +1674,9 @@
                         message: 'Der findes ' + emailtemplates.rows.length + ' emailtemplates på databasen. Du kan ikke slette databasen før alle emailtemplates er slettet.'
                     });
                 }
-                request.del({
+                /*request.del({
                     uri: "http://email:4001/follow/" + req.params.id
-                }, function (err, response, body) {
+                }, function (err, response, body) {*/
                     /*if (err) {
                         return res.status(err.status_code || 500).send(err);
                     }*/
@@ -1691,7 +1691,7 @@
                             res.json(body);
                         });
                     });
-                });
+                //});
             });
         });
     });
@@ -3069,14 +3069,14 @@
                         fs.unlink(sti + "/text.ejs", function (err) {
                             fs.unlink(sti + "/style.css", function (err) {
                                 fs.rmdir(sti, function (err) {
-                                    request.del({
+                                    /*request.del({
                                         uri: "http://email:4001/follow/" + emailtemplate.database
-                                    }, function (err, response, body4) {
+                                    }, function (err, response, body4) {*/
                                         if (err) {
                                             return res.status(err.status_code || 500).send(err);
                                         }
                                         res.end();
-                                    });
+                                    //});
                                 });
                             });
                         });
@@ -3219,14 +3219,14 @@
                                 if (err) {
                                     return res.status(err.status_code || 500).send(err);
                                 }
-                                request.put({
+                                /*request.put({
                                     uri: "http://email:4001/follow/" + req.params.database
                                 }, function (err, response, body4) {
                                     if (err) {
                                         return res.status(err.status_code || 500).send(err);
-                                    }
+                                    }*/
                                     res.end();
-                                });
+                                //});
                             });
                         });
                     });
