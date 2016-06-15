@@ -8,6 +8,11 @@
                 </a>
             </li>
             <li ui-sref-active="active">
+                <a ui-sref="database.schema.simple">
+                    <i class="fa fa-magic"></i> Simple
+                </a>
+            </li>
+            <li ui-sref-active="active">
                 <a ui-sref="database.schema.text">
                     <i class="fa fa-file-text-o"></i> Tekst
                 </a>
@@ -20,10 +25,12 @@
         </ul>
     </div>
 </nav>
+<!--
 <div class="btn-group">
   <button type="button" class="btn btn-default" ng-click="createGeoJSONSchema()">GeoJSON</button>
   <button type="button" class="btn btn-default" ng-click="createBlankSchema()">Tomt</button>
 </div>
+-->
 <div class="alert alert-warning clearfix" role="alert" ng-show="missing">
     <div class="pull-right">
         <button type="button" class="btn btn-warning" ng-click="save()">Opret valideringsskema</button>

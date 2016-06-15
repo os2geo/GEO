@@ -1,29 +1,30 @@
 (function (window, angular, console, tv4) {
     'use strict';
-    angular.module('myApp.controllers').controller('database-schema', ['$scope', '$http', '$stateParams',
-        function ($scope, $http, $stateParams) {
+    angular.module('myApp.controllers').controller('database-schema', ['$rootScope', '$scope', '$http', '$stateParams',
+        function ($rootScope, $scope, $http, $stateParams) {
             $scope.missing = true;
             tv4.addSchema(schemaV4);
             tv4.addSchema(crs_schema);
             tv4.addSchema(bbox_schema);
             tv4.addSchema(geometry_schema);
             tv4.addSchema(geojson_schema);
-            
+
             $http.get('/couchdb/db-' + $stateParams.database + '/_design/schema')
 
-            .success(function (data, status, headers, config) {
-                $scope.missing = false;
-                $scope.schema = data.schema;
-            })
+                .success(function (data, status, headers, config) {
+                    $scope.missing = false;
+                    $scope.schema = data.schema;
+                    $rootScope.$emit("schema", data.schema);
+                })
 
-            .error(function (data, status, headers, config) {
-                if (status === 404) {
-                    $scope.missing = true;
-                } else {
-                    $scope.error = data;
-                }
-                $scope.createGeoJSONSchema();
-            });
+                .error(function (data, status, headers, config) {
+                    if (status === 404) {
+                        $scope.missing = true;
+                    } else {
+                        $scope.error = data;
+                    }
+                    $scope.createGeoJSONSchema();
+                });
             $scope.createBlankSchema = function () {
                 $scope.schema = {
                     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -41,8 +42,8 @@
                     "title": "Projekt",
                     "description": "",
                     "type": [
-    "object"
-  ],
+                        "object"
+                    ],
                     "properties": {
                         "_id": {
                             "type": "string"
@@ -63,64 +64,64 @@
                         },
                         "type": {
                             "enum": [
-        "Feature"
-      ]
+                                "Feature"
+                            ]
                         },
                         "geometry": {
                             "title": "geometry",
                             "description": "One geometry as defined by GeoJSON",
                             "type": "object",
                             "required": [
-        "type",
-        "coordinates"
-      ],
+                                "type",
+                                "coordinates"
+                            ],
                             "oneOf": [
                                 {
                                     "title": "Point",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "Point"
-              ]
+                                                "Point"
+                                            ]
                                         },
                                         "coordinates": {
                                             "$ref": "#/definitions/position"
                                         }
                                     }
-        },
+                                },
                                 {
                                     "title": "MultiPoint",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "MultiPoint"
-              ]
+                                                "MultiPoint"
+                                            ]
                                         },
                                         "coordinates": {
                                             "$ref": "#/definitions/positionArray"
                                         }
                                     }
-        },
+                                },
                                 {
                                     "title": "LineString",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "LineString"
-              ]
+                                                "LineString"
+                                            ]
                                         },
                                         "coordinates": {
                                             "$ref": "#/definitions/lineString"
                                         }
                                     }
-        },
+                                },
                                 {
                                     "title": "MultiLineString",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "MultiLineString"
-              ]
+                                                "MultiLineString"
+                                            ]
                                         },
                                         "coordinates": {
                                             "type": "array",
@@ -129,27 +130,27 @@
                                             }
                                         }
                                     }
-        },
+                                },
                                 {
                                     "title": "Polygon",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "Polygon"
-              ]
+                                                "Polygon"
+                                            ]
                                         },
                                         "coordinates": {
                                             "$ref": "#/definitions/polygon"
                                         }
                                     }
-        },
+                                },
                                 {
                                     "title": "MultiPolygon",
                                     "properties": {
                                         "type": {
                                             "enum": [
-                "MultiPolygon"
-              ]
+                                                "MultiPolygon"
+                                            ]
                                         },
                                         "coordinates": {
                                             "type": "array",
@@ -158,8 +159,8 @@
                                             }
                                         }
                                     }
-        }
-      ]
+                                }
+                            ]
                         },
                         "properties": {
                             "type": "object",
@@ -172,10 +173,10 @@
                         }
                     },
                     "required": [
-    "properties",
-    "type",
-    "geometry"
-  ],
+                        "properties",
+                        "type",
+                        "geometry"
+                    ],
                     "definitions": {
                         "position": {
                             "description": "A single position",
@@ -184,11 +185,11 @@
                             "items": [
                                 {
                                     "type": "number"
-        },
+                                },
                                 {
                                     "type": "number"
-        }
-      ],
+                                }
+                            ],
                             "additionalItems": false
                         },
                         "positionArray": {
@@ -203,22 +204,22 @@
                             "allOf": [
                                 {
                                     "$ref": "#/definitions/positionArray"
-        },
+                                },
                                 {
                                     "minItems": 2
-        }
-      ]
+                                }
+                            ]
                         },
                         "linearRing": {
                             "description": "An array of four positions where the first equals the last",
                             "allOf": [
                                 {
                                     "$ref": "#/definitions/positionArray"
-        },
+                                },
                                 {
                                     "minItems": 4
-        }
-      ]
+                                }
+                            ]
                         },
                         "polygon": {
                             "description": "An array of linear rings",
@@ -244,14 +245,14 @@
                 $http.put('/api/database/' + $stateParams.database + '/schema', {
                     schema: $scope.schema
                 }).
-                success(function (data, status, headers, config) {
-                    $scope.valid = null;
-                    $scope.success = data;
-                    $scope.missing = false;
-                }).
-                error(function (data, status, headers, config) {
-                    $scope.error = data;
-                });
+                    success(function (data, status, headers, config) {
+                        $scope.valid = null;
+                        $scope.success = data;
+                        $scope.missing = false;
+                    }).
+                    error(function (data, status, headers, config) {
+                        $scope.error = data;
+                    });
             };
 
             $scope.addEnum = function () {

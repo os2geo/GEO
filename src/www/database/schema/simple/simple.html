@@ -1,0 +1,133 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Geometry</h3>
+            </div>
+            <div class="panel-body">
+                <p>Angiver hvilke typer af geometry som må gemmes i databasen.</p>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="Point" ng-change="pointChanged()"> Point
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="LineString" ng-change="lineStringChanged()"> LineString
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="Polygon" ng-change="polygonChanged()"> Polygon
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="MultiPoint" ng-change="multiPointChanged()"> MultiPoint
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="MultiLineString" ng-change="multiLineStringChanged()"> MultiLineString
+                            </label>
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="MultiPolygon" ng-change="multiPolygonChanged()"> MultiPolygon
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Attachments</h3>
+            </div>
+            <div class="panel-body">
+                <p>Angiver hvilke attachments (billeder) som må gemmes i databasen.</p>
+                <p>
+                    <button type="button" class="btn btn-success" ng-click="addAttachment()">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add attachment
+                    </button>
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Title</th>
+                            <th>Required</th>
+                        </tr>
+                        <tr ng-repeat="field in attachments">
+                            <td>
+                                <button type="button" class="btn btn-default btn-sm" ng-click="removeAttachment(field)">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                            <td><input type="text" class="form-control" ng-model="field.name" ng-change="attachmentNameChanged(field)"></td>
+                            <td><input type="text" class="form-control" ng-model="field.title" ng-change="attachmentTitleChanged(field)"></td>
+                            <td><input type="checkbox" ng-model="field.required" ng-change="attachmentRequiredChanged(field)"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Datafields</h3>
+    </div>
+    <div class="panel-body">
+        <p>Angiver hvilke felter som må gemmes i databasen.</p>
+        <p>
+            <button type="button" class="btn btn-success" ng-click="addDataField()">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add datafield
+            </button>
+        </p>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                </tr>
+                <tr ng-repeat="field in fields">
+                    <td>
+                        <button type="button" class="btn btn-default btn-sm" ng-click="removeDataField(field)">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                    <td><input type="text" class="form-control" ng-model="field.name" ng-change="fieldNameChanged(field)"></td>
+                    <td><input type="text" class="form-control" ng-model="field.title" ng-change="fieldTitleChanged(field)"></td>
+                    <td>
+                        <select class="form-control" ng-model="field.type" ng-change="fieldTypeChanged(field)">
+                            <option>string</option>
+                            <option>boolean</option>
+                            <option>integer</option>
+                            <option>number</option>                                                                    
+                            <option>date-time</option>
+                            <option>email</option>
+                            <option>hostname</option>
+                            <option>ipv4</option>
+                            <option>ipv6</option>
+                            <option>uri</option>
+                        </select>
+                    </td>
+                    <td><input type="checkbox" ng-model="field.required" ng-change="fieldRequiredChanged(field)"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

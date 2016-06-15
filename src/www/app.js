@@ -344,6 +344,14 @@
                     label: 'Wizard'
                 }
             });
+            $stateProvider.state('database.schema.simple', {
+                url: '/simple',
+                templateUrl: 'database/schema/simple/simple.html',
+                controller: 'schema-simple',
+                ncyBreadcrumb: {
+                    label: 'Simple'
+                }
+            });
             $stateProvider.state('database.schema.test', {
                 url: '/test',
                 templateUrl: 'database/schema/test/test.html',
