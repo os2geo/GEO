@@ -8,8 +8,8 @@
                 </a>
             </li>
             <li ui-sref-active="active">
-                <a ui-sref="database.schema.simple">
-                    <i class="fa fa-magic"></i> Simple
+                <a ui-sref="database.schema.advanced">
+                    <i class="fa fa-magic"></i> Advanced
                 </a>
             </li>
             <li ui-sref-active="active">
@@ -35,13 +35,16 @@
     <div class="pull-right">
         <button type="button" class="btn btn-warning" ng-click="save()">Opret valideringsskema</button>
     </div>
-    <div><strong>Advarsel:</strong> Data bliver ikke valideret! Hvis du vil sikre at databasen kun indeholder data i en bestemt struktur så opret et valideringsskema.</div>
+    <div><strong>Advarsel:</strong> Data bliver ikke valideret! Hvis du vil sikre at databasen kun indeholder data i en bestemt
+        struktur så opret et valideringsskema.</div>
 </div>
-<div class="alert alert-warning clearfix" role="alert" ng-show="valid.valid">
-    <div class="pull-right">
-        <button type="button" class="btn btn-warning" ng-click="save()"><i class="fa fa-save"></i> Gem</button>
+<div class="top" ng-show="valid.valid">
+    <div class="alert alert-warning clearfix" role="alert" >
+        <div class="pull-right">
+            <button type="button" class="btn btn-warning" ng-click="save()"><i class="fa fa-save"></i> Gem</button>
+        </div>
+        <div><strong>Advarsel:</strong> Skemaet er blevet ændret, husk at gemme.</div>
     </div>
-    <div><strong>Advarsel:</strong> Skemaet er blevet ændret, husk at gemme.</div>
 </div>
 <div class="alert alert-danger" role="alert" ng-show="error">
     <strong>Fejl:</strong> {{error}}

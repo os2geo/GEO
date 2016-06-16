@@ -338,18 +338,18 @@
             });
             $stateProvider.state('database.schema.wizard', {
                 url: '/wizard',
-                templateUrl: 'database/schema/wizard/wizard.html',
-                controller: 'schema-wizard',
+                templateUrl: 'database/schema/simple/simple.html',
+                controller: 'schema-simple',
                 ncyBreadcrumb: {
                     label: 'Wizard'
                 }
             });
-            $stateProvider.state('database.schema.simple', {
+            $stateProvider.state('database.schema.advanced', {
                 url: '/simple',
-                templateUrl: 'database/schema/simple/simple.html',
-                controller: 'schema-simple',
+                templateUrl: 'database/schema/wizard/wizard.html',
+                controller: 'schema-wizard',
                 ncyBreadcrumb: {
-                    label: 'Simple'
+                    label: 'Advanced'
                 }
             });
             $stateProvider.state('database.schema.test', {

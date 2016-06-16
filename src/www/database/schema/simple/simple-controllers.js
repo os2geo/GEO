@@ -281,7 +281,7 @@
                 $scope.$emit('validate');
             };
             $scope.fieldTypeChanged = function (field) {
-                if (field.name !== "" && !schema.properties.properties.properties.hasOwnProperty(field.name)) {
+                if (field.name !== "" && schema.properties.properties.properties.hasOwnProperty(field.name)) {
                     if (field.type === "string" || field.type === "boolean" || field.type === "integer" || field.type === "number") {
                         schema.properties.properties.properties[field.name].type = field.type;
                         if (schema.properties.properties.properties[field.name].hasOwnProperty("format")) {
@@ -295,6 +295,8 @@
                 }
             };
             $scope.attachmentNameChanged = function (field) {
+                var name = 'tn_' + field.name;
+                var key = 'tn_' + field.key;
                 if (field.name !== "") {
                     if (!schema.properties._attachments.properties.hasOwnProperty(field.name)) {
                         schema.properties._attachments.properties[field.name] = schema.properties._attachments.properties[field.key];
@@ -302,8 +304,7 @@
                         field.key = field.name;
 
                     }
-                    var name = 'tn_' + field.name;
-                    var key = 'tn_' + field.key;
+                    
                     if (!schema.properties._attachments.properties.hasOwnProperty(name)) {
                         schema.properties._attachments.properties[name] = schema.properties._attachments.properties[key];
                         delete schema.properties._attachments.properties[key];
