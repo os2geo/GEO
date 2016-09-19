@@ -10,7 +10,7 @@
         crypto = require('crypto'),
         async = require('async'),
         imageType = require('image-type'),
-        //sqlite3 = require('sqlite3'),
+        sqlite3 = require('sqlite3'),
         request = require('request'),
         http = require('http'),
         os = require("os"),
@@ -4018,6 +4018,6 @@
         });
     });
 
-    app.listen(4000);
+    app.listen(4001);
     console.log('Listening on port 4000');
 } ());
