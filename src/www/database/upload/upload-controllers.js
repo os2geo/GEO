@@ -15,8 +15,12 @@
                 // $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
             };
             var upload = function (file) {
+                var url = '/api/upload';
+                if(file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
+                    url+='csv'
+                }
                 $scope.upload = $upload.upload({
-                    url: '/api/upload/' + $stateParams.database, //upload.php script, node.js route, or servlet url
+                    url: url +'/' + $stateParams.database, //upload.php script, node.js route, or servlet url
                     //method: 'POST' or 'PUT',
                     //headers: {'header-key': 'header-value'},
                     //withCredentials: true,

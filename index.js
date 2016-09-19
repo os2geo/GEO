@@ -19,6 +19,7 @@
         compress = require('compression'),
         basicAuth = require('basic-auth'),
         cors = require('cors'),
+        XLSX = require('xlsx'),
         bodyParser = require('body-parser'),
         parseString = require('xml2js').parseString,
         Dicer = require('dicer'),
@@ -2051,6 +2052,160 @@
                                 });
                             });
                         }
+                    });
+                });
+                req.pipe(busboy);
+            }
+        });
+    });
+    app.post('/api/uploadcsv/:database', auth, function (req, res) {
+        db_admin.get(req.params.database, function (err, database) {
+            if (err) {
+                return res.status(err.status_code || 500).send(err);
+            }
+            if (req.userCtx.roles.indexOf("_admin") === -1 && req.userCtx.roles.indexOf("sys") === -1 && req.userCtx.roles.indexOf("admin_" + database.organization) === -1) {
+                return res.status(401).send(JSON.stringify({
+                    ok: false,
+                    message: 'Du har ikke rettigheder til at opdatere skemaet.'
+                }));
+            }
+            if (!(req.headers['content-type'] &&
+                req.headers['content-type'].indexOf('multipart/form-data') === 0 && req.method === 'POST')) {
+                return res.status(400).send(JSON.stringify({
+                    ok: false,
+                    message: 'Fil er påkrævet.'
+                }));
+            } else {
+                var busboy = new Busboy({
+                    headers: req.headers
+                });
+
+                busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+                    //console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+                    var buffer = [],
+                        finalbuffer;
+                    file.on('data', function (data) {
+                        buffer.push(data);
+                    });
+                    file.on('end', function () {
+                        finalbuffer = Buffer.concat(buffer);
+                        var kolonner;
+                        var db = nano.db.use('db-' + req.params.database);
+                        var schema = {
+                            "$schema": "http://json-schema.org/draft-04/schema#",
+                            "title": "Projekt",
+                            "description": "",
+                            "type": ["object"],
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "_rev": {
+                                    "type": "string"
+                                },
+                                "_revisions": {
+                                    "type": "object",
+                                    "properties": {
+                                        "start": {
+                                            "type": "integer"
+                                        },
+                                        "ids": {
+                                            "type": "array"
+                                        }
+                                    }
+                                },
+                                "properties": {
+                                    "type": "object",
+                                    "properties": {
+
+                                    }
+                                }
+                            },
+                            "required": ["properties"]
+                        };
+                        Promise.resolve().then(function () {
+                            return new Promise(function (resolve, reject) {
+                                db.list({ include_docs: true }, function (err, body) {
+                                    if (!err) {
+                                        var docs = [];
+                                        for (var i = 0; i < body.rows.length; i++) {
+                                            var doc = body.rows[i];
+                                            if (doc.id.indexOf('_design') === -1) {
+                                                doc.doc._deleted = true;
+                                                docs.push(doc.doc);
+                                            }
+                                        }
+                                        db.bulk({ docs: docs }, function (err, body) {
+                                            if (err) {
+                                                reject(err);
+                                            } else {
+                                                resolve();
+                                            }
+                                        });
+                                    } else {
+                                        reject(err);
+                                    }
+                                });
+                            });
+                        }).then(function () {
+                            return new Promise(function (resolve, reject) {
+                                var xlsx = XLSX.read(finalbuffer.toString('base64'), { type: "base64" });
+                                var sheet1 = xlsx.SheetNames[0];
+                                var data = {}
+                                for (var cell in xlsx.Sheets[sheet1]) {
+                                    if (cell[0] !== '!') {
+                                        var row = cell.match(/\d+/g);
+                                        var col = cell.match(/[a-zA-Z]+/g);
+                                        if (!data.hasOwnProperty(row)) {
+                                            data[row] = {};
+                                        }
+                                        var v = xlsx.Sheets[sheet1][cell].v;
+                                        if (v.trim) {
+                                            v = v.trim();
+                                            v = v.trim('?');
+                                        }
+                                        data[row][col] = v;
+
+                                    }
+                                }
+                                kolonner = data['1'];
+                                var docs = [];
+                                for (var r in data) {
+                                    if (r !== '1') {
+                                        var doc = { properties: {} };
+                                        var row = data[r];
+                                        for (var k in row) {
+                                            var kolonne = kolonner[k];
+                                            if (kolonne !== '_id' && kolonne !== '_rev'){
+                                                doc.properties[kolonne] = row[k];
+                                                schema.properties.properties.properties[kolonne] = {
+                                                    "type": typeof doc.properties[kolonne]
+                                                };
+                                            }
+                                        }
+                                        docs.push(doc);
+                                    }
+                                }
+                                db.bulk({ docs: docs }, function (err, body) {
+                                    if (err) {
+                                        reject(err);
+                                    } else {
+                                        resolve(body);
+                                    }
+                                })
+                            });
+                        }).then(function (body) {
+                            db.head('_design/schema', function (err, _, headers) {
+                                if (err) {
+                                    req.body.schema = schema;
+                                    schemaPostPut(req, res);
+                                } else {
+                                    res.json(body);
+                                }
+                            });                                                  
+                        }).catch(function (err) {
+                            res.status(500).json(err);
+                        });
                     });
                 });
                 req.pipe(busboy);

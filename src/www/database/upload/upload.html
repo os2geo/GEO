@@ -1,6 +1,10 @@
 <div ng-controller="database-upload">
     <div class="panel panel-default">
         <div class="panel-body">
+            <h2>Upload GeoJSON eller Excel (.xlsx) filer</h2> 
+            <div class="alert alert-warning" role="alert" >
+                <strong>Advarsel:</strong> Eksisterende dokumenter slettes. Valideringsskema slettes ikke. Der oprettes valideringsskema hvis det ikke allerede er oprettet.  
+            </div>
             <form novalidate class="form-horizontal" role="form" name="myform" ng-submit="update(myform)">
                 <div class="form-group has-feedback" ng-class="{ 'has-error': myform.name.$error.required && !myform.name.$pristine, 'has-success': myform.name.$valid && !myform.name.$pristine}">
                     <label for="name" class="col-sm-2 control-label">Fil</label>
