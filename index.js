@@ -1563,7 +1563,7 @@
                         if (err) {
                             return res.status(err.status_code || 500).send(err);
                         }
-                        res.json(body2);
+                        res.json(body);
                     });
                 });
             });
