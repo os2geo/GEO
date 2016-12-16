@@ -114,7 +114,8 @@
                                 };
                             dbOrganization.insert(security, "_security", function (err, body) {
                                 var secdoc = {
-                                    validate_doc_update: "function (newDoc, oldDoc, userCtx, secObj) { if (userCtx.roles.indexOf('_admin') !== -1 || userCtx.roles.indexOf('sys') !== -1 || userCtx.roles.indexOf('admin_" + req.params.id + "') !== -1){return;} else {throw ({ forbidden: 'Du har ikke rettigheder til denne operation.' });}}"
+                                    //validate_doc_update: "function (newDoc, oldDoc, userCtx, secObj) { if (userCtx.roles.indexOf('_admin') !== -1 || userCtx.roles.indexOf('sys') !== -1 || userCtx.roles.indexOf('admin_" + req.params.id + "') !== -1){return;} else {throw ({ forbidden: 'Du har ikke
+                                    validate_doc_update: "function (newDoc, oldDoc, userCtx, secObj) { if (userCtx.roles.indexOf('_admin') !== -1 || userCtx.roles.indexOf('sys') !== -1 || userCtx.roles.indexOf('admin_" + organization + "') !== -1){return;} else {throw ({ forbidden: 'Du har ikke rettigheder til denne operation.' });}}"
                                 };
                                 dbOrganization.insert(secdoc, '_design/security', function (err, body) {
                                     callback();
@@ -1562,7 +1563,7 @@
                         if (err) {
                             return res.status(err.status_code || 500).send(err);
                         }
-                        res.json(body4);
+                        res.json(body2);
                     });
                 });
             });
