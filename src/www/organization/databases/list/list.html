@@ -5,7 +5,7 @@
             <th><i class="fa fa-file-o"></i> Dokumenter</th>
             <th><i class="fa fa-hdd-o"></i> Størrelse</th>
         </tr>
-        <tr ng-repeat="item in databases">
+        <tr ng-repeat="item in databases | orderBy: 'value'">
             <td><a ui-sref="database.info({database:item.id,organization:organization._id})"><i class="fa fa-database"></i> {{item.value}}</a>
             </td>
             <td>{{item.info.doc_count}}</td>

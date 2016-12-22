@@ -1528,6 +1528,7 @@
         db_admin.insert({
             name: req.body.name,
             organization: req.body.organization,
+            timestamp: Date.now(),
             type: 'database'
         }, function (err, body) {
             if (err) {
@@ -3381,7 +3382,7 @@
                                     if (err) {
                                         return res.status(err.status_code || 500).send(err);
                                     }*/
-                                    res.end();
+                                    res.json(body);
                                 //});
                             });
                         });
