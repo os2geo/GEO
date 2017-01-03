@@ -3171,7 +3171,8 @@
                                     if (doc) {
                                         d.get(doc.id, function (err, data) {
                                             template(req.params.id, {
-                                                doc: data
+                                                doc: data,
+                                                env: config.env
                                             }, function (err, html, text) {
                                                 res.json({
                                                     doc: body,
@@ -3183,7 +3184,8 @@
                                         });
                                     } else {
                                         template(req.params.id, {
-                                            doc: null
+                                            doc: null,
+                                            env: config.env
                                         }, function (err, html, text) {
                                             res.json({
                                                 doc: body,
