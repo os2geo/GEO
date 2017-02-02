@@ -2942,15 +2942,15 @@
                     colors: true
                 }));*/
                 request.del({
-                    uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id
+                    uri: "http://" + config.elasticsearch.host + "/db-" + req.params.id
                 }, function (err, response, body) {
                     //console.log("del1",err);
                     request.del({
-                        uri: "http://" + config.elasticsearch.host + "/es/_river/db-" + req.params.id
+                        uri: "http://" + config.elasticsearch.host + "/_river/db-" + req.params.id
                     }, function (err, response, body) {
                         //console.log("del2",err);
                         request.post({
-                            uri: "http://" + config.elasticsearch.host + "/es/db-" + req.params.id,
+                            uri: "http://" + config.elasticsearch.host + "/db-" + req.params.id,
                             json: {
                                 mappings: mappings
                             }
@@ -2963,7 +2963,7 @@
                                 "couchdb": {
                                     "host": config.elasticsearch.couchdb.host,
                                     "port": config.elasticsearch.couchdb.port,
-                                    "db": "couchdb/db-" + req.params.id,
+                                    "db": "db-" + req.params.id,
                                     "filter": "schema/data"
                                 },
                                 "index": {
@@ -2974,7 +2974,7 @@
                                 }
                             };
                             request.put({
-                                uri: "http://" + config.elasticsearch.host + "/es/_river/db-" + req.params.id + '/_meta',
+                                uri: "http://" + config.elasticsearch.host + "/_river/db-" + req.params.id + '/_meta',
                                 json: river
                             }, function (err, response, body) {
                                 if (err) {
