@@ -1,7 +1,7 @@
 (function (window, angular, console) {
     'use strict';
-    angular.module('myApp.controllers').controller('organizations-list', ['$scope', '$rootScope', '$http','$q', 
-        function ($scope, $rootScope, $http, $q) {
+    angular.module('myApp.controllers').controller('organizations-list', ['$scope', '$rootScope', '$http','$q', 'socket',
+        function ($scope, $rootScope, $http, $q, socket) {
             var getDatabases = function (organization) {
                 $http.get('/api/organization/' + organization.id+'/databases').
                 success(function (data, status, headers, config) {

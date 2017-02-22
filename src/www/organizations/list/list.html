@@ -7,7 +7,7 @@
             <th><i class="fa fa-file-o"></i> Disksize</th>
             <th><i class="fa fa-users"></i> Brugere</th>
         </tr>
-        <tr ng-repeat="item in profile.user.organizations">
+        <tr ng-repeat="item in profile.user.organizations | orderBy: 'value.name'">
 
             <td><a href="#/organizations/{{item.id}}/info">{{item.value.name}}</a>
             </td>
@@ -18,3 +18,5 @@
         </tr>
     </table>
 </div>
+<h1>Online users: {{online.connected}}</h1>
+<h1>Online Authenticated: {{online.authenticated}}</h1>
