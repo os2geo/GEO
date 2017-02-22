@@ -1,7 +1,7 @@
 (function (window, angular, console) {
     'use strict';
-    angular.module('myApp.controllers', []).controller('navigation', ['$scope', '$rootScope', '$state', '$http',
-        function ($scope, $rootScope, $state, $http) {
+    angular.module('myApp.controllers', []).controller('navigation', ['$scope', '$rootScope', '$state', '$http','socket',
+        function ($scope, $rootScope, $state, $http, socket) {
             $scope.logoff = function () {
                 $http.delete('/api/session').
                 success(function (data, status, headers, config) {
