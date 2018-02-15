@@ -2126,7 +2126,7 @@
                             "required": ["properties"]
                         };
                         Promise.resolve().then(function () {
-                            return new Promise(function (resolve, reject) {
+                            /*return new Promise(function (resolve, reject) {
                                 db.list({ include_docs: true }, function (err, body) {
                                     if (!err) {
                                         var docs = [];
@@ -2149,25 +2149,22 @@
                                     }
                                 });
                             });
-                        }).then(function () {
+                        }).then(function () {*/
                             return new Promise(function (resolve, reject) {
                                 var xlsx = XLSX.read(finalbuffer.toString('base64'), { type: "base64" });
                                 var sheet1 = xlsx.SheetNames[0];
                                 var data = {}
-                                for (var cell in xlsx.Sheets[sheet1]) {
-                                    if (cell[0] !== '!') {
-                                        var row = cell.match(/\d+/g);
-                                        var col = cell.match(/[a-zA-Z]+/g);
+                                for (var key in xlsx.Sheets[sheet1]) {
+                                    if (key[0] !== '!') {
+                                        var row = key.match(/\d+/g);
+                                        var col = key.match(/[a-zA-Z]+/g);
                                         if (!data.hasOwnProperty(row)) {
                                             data[row] = {};
                                         }
-                                        var v = xlsx.Sheets[sheet1][cell].v;
-                                        if (v.trim) {
-                                            v = v.trim();
-                                            v = v.trim('?');
+                                        var cell = xlsx.Sheets[sheet1][key];
+                                        if(cell.hasOwnProperty('v')) {
+                                            data[row][col] = cell.v;
                                         }
-                                        data[row][col] = v;
-
                                     }
                                 }
                                 kolonner = data['1'];
@@ -2178,7 +2175,9 @@
                                         var row = data[r];
                                         for (var k in row) {
                                             var kolonne = kolonner[k];
-                                            if (kolonne !== '_id' && kolonne !== '_rev'){
+                                            if(kolonne === '_id' || kolonne === '_rev'){
+                                                doc[kolonne]=row[k];
+                                            } else {
                                                 doc.properties[kolonne] = row[k];
                                                 schema.properties.properties.properties[kolonne] = {
                                                     "type": typeof doc.properties[kolonne]
@@ -2302,6 +2301,66 @@
             }
             res.header('Content-Type', 'text/csv');
             res.send(iconv.encode(csv, 'win1252'));
+        });
+    });
+    app.get('/api/exportxlsx/:database', auth, function (req, res) {
+        var d = nano.db.use(req.params.database);
+        d.list({
+            include_docs: true
+        }, function (err, body) {
+            if (err) {
+                return res.status(err.status_code || 500).send(err);
+            }
+            var ws = {};
+            var columns = ['_id','_rev'];
+            var attachments = [];
+            for (var i = 0; i < body.rows.length; i++) {
+                var row = body.rows[i];
+                if (row.id.substring(0, 1) !== '_') {
+                    if (row.doc.hasOwnProperty('properties')) {
+                        for (var key in row.doc.properties) {
+                            if (columns.indexOf(key) === -1) {
+                                columns.push(key);
+                            }
+                        }
+                    }
+                }
+            }
+            for (var j = 0; j < columns.length; j++) {
+                var cell = {v: columns[j], t:'s' };
+                var cell_ref = XLSX.utils.encode_cell({c:j,r:0});
+                ws[cell_ref] = cell;
+            }
+            var range = {s: {c:0, r:0}, e: {c:columns.length-1, r:body.rows.length }};
+            for (var R= 1; R <= body.rows.length; R++) {
+                var row = body.rows[R-1];
+                if (row.id.substring(0, 1) !== '_') {
+                    for (var C = 0; C < columns.length; C++) {            
+                        var column = columns[C];
+                        var cell = {}
+                        if(C<2) {
+                            cell.v = row.doc[column]
+                        } else if (row.doc.hasOwnProperty("properties") && row.doc.properties.hasOwnProperty(column)) {
+                            cell.v = row.doc.properties[column];
+                        }
+                        if(cell.hasOwnProperty('v')){
+                            if(typeof cell.v === 'number') cell.t = 'n';
+                            else if(typeof cell.v === 'boolean') cell.t = 'b';
+                            else cell.t = 's';
+                            var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
+                            ws[cell_ref] = cell;
+                        }
+                    }
+                }
+            }
+            ws['!ref'] = XLSX.utils.encode_range(range);
+            let wb = {
+                SheetNames: ['Ark1'],
+                Sheets: { Ark1: ws }
+            }
+            var wopts = { bookType:'xlsx', bookSST:false, type:'buffer' };
+            res.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.send(XLSX.write(wb,wopts));
         });
     });
     app.get('/api/export/:database', auth, function (req, res) {

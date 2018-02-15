@@ -80,7 +80,14 @@
                 </div>
                 <div>CSV</div>
             </a>
-        </li>        
+        </li>     
+        <li ui-sref-active="active">
+            <a ng-href="/api/exportxlsx/db-{{stateParams.database}}" target="_blank">
+                <div><i class="fa fa-2x fa-cloud-download"></i>
+                </div>
+                <div>Excel</div>
+            </a>
+        </li>     
         <li ui-sref-active="active">
             <a ui-sref="database.delete">
                 <div><i class="fa fa-2x fa-trash-o"></i>
