@@ -1677,23 +1677,32 @@
                         message: 'Der findes ' + emailtemplates.rows.length + ' emailtemplates på databasen. Du kan ikke slette databasen før alle emailtemplates er slettet.'
                     });
                 }
+                request.del({
+                    uri: "http://" + config.elasticsearch.host + "/db-" + database._id
+                }, function (err, response, body) {
+                    //console.log("del1",err);
+                    request.del({
+                        uri: "http://" + config.elasticsearch.host + "/_river/db-" + database._id
+                    }, function (err, response, body) {
                 /*request.del({
                     uri: "http://email:4001/follow/" + req.params.id
                 }, function (err, response, body) {*/
                     /*if (err) {
                         return res.status(err.status_code || 500).send(err);
                     }*/
-                    db_admin.destroy(database._id, database._rev, function (err, body) {
-                        if (err) {
-                            return res.status(err.status_code || 500).send(err);
-                        }
-                        nano.db.destroy('db-' + database._id, function (err, body) {
+                        db_admin.destroy(database._id, database._rev, function (err, body) {
                             if (err) {
                                 return res.status(err.status_code || 500).send(err);
                             }
-                            res.json(body);
+                            nano.db.destroy('db-' + database._id, function (err, body) {
+                                if (err) {
+                                    return res.status(err.status_code || 500).send(err);
+                                }
+                                res.json(body);
+                            });
                         });
                     });
+                });
                 //});
             });
         });
